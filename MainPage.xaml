@@ -7,7 +7,7 @@
         <VerticalStackLayout
             Spacing="25"
             Padding="30,0"
-            VerticalOptions="Center">
+            VerticalOptions="Start">
 
             <!-- To-Do List UI Code -->
             <StackLayout>
@@ -21,7 +21,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </StackLayout>
-
+            
         </VerticalStackLayout>
     </ScrollView>
 
