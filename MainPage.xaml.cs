@@ -17,6 +17,8 @@ public partial class MainPage : ContentPage
         RefreshTasksList();
     }
 
+    private string tasksFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tasks.txt");
+
     private void OnAddTaskClicked(object sender, EventArgs e)
     {
         try
@@ -24,29 +26,16 @@ public partial class MainPage : ContentPage
             string taskText = taskEntry.Text;
             if (!string.IsNullOrWhiteSpace(taskText))
             {
-                using (var db = new TaskDbContext())
-                {
-                    TasksModel task = new TasksModel { TaskText = taskText };
-                    db.Tasks.Add(task);
-                    db.SaveChanges();
-                }
+                // Save the task to the text file
+                File.AppendAllText(tasksFilePath, taskText + Environment.NewLine);
 
                 taskEntry.Text = string.Empty; // Clear the entry field after adding task
                 RefreshTasksList();
             }
         }
-        catch (DbUpdateException ex)
-        {
-            // Handle database-related exceptions and log the inner exception details
-            Console.WriteLine("Database Error: " + ex.Message);
-            Console.WriteLine("Inner Exception: " + ex.InnerException?.Message);
-            Console.WriteLine("StackTrace: " + ex.StackTrace);
-        }
         catch (Exception ex)
         {
-            // Catch any other unexpected exceptions
-            Console.WriteLine("Unexpected Error: " + ex.Message);
-            Console.WriteLine("StackTrace: " + ex.StackTrace);
+            Console.WriteLine("Error: " + ex.Message);
         }
     }
 
@@ -54,15 +43,16 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            using (var db = new TaskDbContext())
+            // Read tasks from the text file
+            if (File.Exists(tasksFilePath))
             {
-                var tasks = db.Tasks.Select(t => t.TaskText).ToList();
+                string[] tasks = File.ReadAllLines(tasksFilePath);
                 taskListView.ItemsSource = tasks;
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine("Error: " + ex.Message);
+            Console.WriteLine("Error: " + ex.Message);
         }
     }
 }
